@@ -2,17 +2,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, GitPullRequest, Users, Package, DollarSign,
-  Shield, Settings, LogOut, Zap, ChevronRight, TrendingUp
+  Shield, Settings, LogOut, Zap, ChevronRight, TrendingUp,
+  BarChart2, HeartHandshake, Send, Lock,
 } from "lucide-react";
 import { mockSession, mockKPIs, mockComissoes } from "../data/verbatechData";
 
 const NAV_ITEMS = [
-  { path: "/",           label: "Dashboard",     icon: LayoutDashboard, color: "#6366F1" },
-  { path: "/esteira",    label: "Esteira",        icon: GitPullRequest,  color: "#8B5CF6", badge: 3 },
-  { path: "/corban",     label: "Corban CRM",     icon: Users,           color: "#06B6D4" },
-  { path: "/produtos",   label: "Produtos",       icon: Package,         color: "#10B981" },
-  { path: "/financeiro", label: "Financeiro",     icon: DollarSign,      color: "#F59E0B" },
-  { path: "/compliance", label: "Compliance & IA",icon: Shield,          color: "#EF4444", badge: 1 },
+  { path: "/",               label: "Dashboard",      icon: LayoutDashboard, color: "#6366F1" },
+  { path: "/esteira",        label: "Esteira",         icon: GitPullRequest,  color: "#8B5CF6", badge: 3 },
+  { path: "/corban",         label: "Corban CRM",      icon: Users,           color: "#06B6D4" },
+  { path: "/produtos",       label: "Produtos",        icon: Package,         color: "#10B981" },
+  { path: "/financeiro",     label: "Financeiro",      icon: DollarSign,      color: "#F59E0B" },
+  { path: "/compliance",     label: "Compliance & IA", icon: Shield,          color: "#EF4444", badge: 1 },
+  { path: "/produtividade",  label: "Produtividade",   icon: BarChart2,       color: "#A855F7" },
+  { path: "/seguros",        label: "Seguros",         icon: HeartHandshake,  color: "#EF4444" },
+  { path: "/campanhas",      label: "Campanhas",       icon: Send,            color: "#25D366", badge: 2 },
+  { path: "/seguranca",      label: "Segurança",       icon: Lock,            color: "#F59E0B", badge: 2 },
 ];
 
 const NIVEL_COLORS = {

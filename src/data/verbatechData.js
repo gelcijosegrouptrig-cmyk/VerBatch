@@ -605,3 +605,267 @@ export const calcParcela = (valor, taxa, prazo) => {
   const r = taxa / 100;
   return (valor * r * Math.pow(1 + r, prazo)) / (Math.pow(1 + r, prazo) - 1);
 };
+
+// ─────────────────────────────────────────────────────────────
+// PRODUTIVIDADE — Digitadores & Relatórios
+// ─────────────────────────────────────────────────────────────
+export const mockDigitadores = [
+  {
+    id: "dig001", nome: "Ana Paula Santos", cpf: "045.xxx.xxx-12", avatar: "AP",
+    masterId: "c001", loja: "SP-Centro", status: "ativo",
+    meta: 50, contratos: 48, producaoMes: 142000, ticketMedio: 18200,
+    taxaConversao: 74.2, taxaAprovacao: 91.5, tempoMedio: 2.4,
+    produtos: { consignadoINSS: 28, fgts: 12, rmc: 5, pessoal: 3 },
+    historico: [32,38,41,44,46,48], ranking: 1,
+  },
+  {
+    id: "dig002", nome: "Carlos Mendes Silva", cpf: "067.xxx.xxx-34", avatar: "CM",
+    masterId: "c001", loja: "SP-Centro", status: "ativo",
+    meta: 40, contratos: 37, producaoMes: 108000, ticketMedio: 16500,
+    taxaConversao: 68.5, taxaAprovacao: 87.3, tempoMedio: 3.1,
+    produtos: { consignadoINSS: 22, fgts: 9, rmc: 4, pessoal: 2 },
+    historico: [25,28,31,34,35,37], ranking: 2,
+  },
+  {
+    id: "dig003", nome: "Fernanda Lima", cpf: "089.xxx.xxx-56", avatar: "FL",
+    masterId: "c001", loja: "SP-Pinheiros", status: "ativo",
+    meta: 35, contratos: 34, producaoMes: 98500, ticketMedio: 17200,
+    taxaConversao: 71.8, taxaAprovacao: 89.0, tempoMedio: 2.8,
+    produtos: { consignadoINSS: 20, fgts: 8, rmc: 4, pessoal: 2 },
+    historico: [22,25,28,30,32,34], ranking: 3,
+  },
+  {
+    id: "dig004", nome: "Roberto Alves", cpf: "012.xxx.xxx-78", avatar: "RA",
+    masterId: "c002", loja: "RJ-Zona Sul", status: "ativo",
+    meta: 30, contratos: 29, producaoMes: 84000, ticketMedio: 15800,
+    taxaConversao: 62.3, taxaAprovacao: 83.4, tempoMedio: 3.5,
+    produtos: { consignadoINSS: 17, fgts: 7, rmc: 3, pessoal: 2 },
+    historico: [18,20,22,25,27,29], ranking: 4,
+  },
+  {
+    id: "dig005", nome: "Patricia Costa", cpf: "034.xxx.xxx-90", avatar: "PC",
+    masterId: "c002", loja: "RJ-Centro", status: "ativo",
+    meta: 25, contratos: 21, producaoMes: 61000, ticketMedio: 14200,
+    taxaConversao: 55.6, taxaAprovacao: 79.8, tempoMedio: 4.2,
+    produtos: { consignadoINSS: 13, fgts: 5, rmc: 2, pessoal: 1 },
+    historico: [14,15,17,18,20,21], ranking: 5,
+  },
+  {
+    id: "dig006", nome: "Lucas Ferreira", cpf: "056.xxx.xxx-01", avatar: "LF",
+    masterId: "c003", loja: "BH-Savassi", status: "afastado",
+    meta: 30, contratos: 12, producaoMes: 34500, ticketMedio: 13800,
+    taxaConversao: 40.0, taxaAprovacao: 71.2, tempoMedio: 5.8,
+    produtos: { consignadoINSS: 8, fgts: 3, rmc: 1, pessoal: 0 },
+    historico: [18,20,19,16,14,12], ranking: 6,
+  },
+];
+
+export const mockRelatorioMes = {
+  periodo: "Abril/2024",
+  totalDigitadores: 6,
+  ativos: 5,
+  afastados: 1,
+  totalContratos: 181,
+  producaoTotal: 528000,
+  ticketMedioGeral: 16000,
+  taxaConversaoMedia: 62.1,
+  taxaAprovacaoMedia: 83.7,
+  metaAtingimento: 87.5,
+  topProduto: "Consignado INSS",
+  distribuicaoProdutos: [
+    { produto: "Consig. INSS", contratos: 108, producao: 312000, pct: 59.0 },
+    { produto: "FGTS", contratos: 44, producao: 127000, pct: 24.0 },
+    { produto: "RMC/RCC", contratos: 19, producao: 55000, pct: 10.5 },
+    { produto: "Pessoal", contratos: 10, producao: 34000, pct: 6.5 },
+  ],
+  evolucaoSemanal: [
+    { semana: "S1", contratos: 38, producao: 110000 },
+    { semana: "S2", contratos: 44, producao: 128000 },
+    { semana: "S3", contratos: 52, producao: 152000 },
+    { semana: "S4", contratos: 47, producao: 138000 },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
+// SEGUROS — Multiproduct Insurance
+// ─────────────────────────────────────────────────────────────
+export const mockSeguros = [
+  {
+    id: "seg001", tipo: "Vida", nome: "VerbaTech Vida Proteção", seguradora: "SulAmérica",
+    api: "SulAmérica API v3", status: "online", comissaoBase: 8.0,
+    premioMin: 29.90, premioMax: 299.90, cobertura: 50000,
+    contratosMes: 42, producaoMes: 3890, comissaoMes: 311.20,
+    publico: "Beneficiários INSS, Servidores", prazoCarencia: 30,
+    beneficios: ["Morte natural", "Morte acidental", "Invalidez permanente", "Doenças graves"],
+    vantagens: ["Sem carência para acidente", "Desconto em folha", "Cobertura nacional"],
+    taxaConversao: 38.5,
+  },
+  {
+    id: "seg002", tipo: "Prestamista", nome: "Proteção Consignado", seguradora: "Tokio Marine",
+    api: "Tokio API v2", status: "online", comissaoBase: 6.5,
+    premioMin: 0.50, premioMax: 2.20, cobertura: null,
+    contratosMes: 87, producaoMes: 6200, comissaoMes: 403.00,
+    publico: "Todos tomadores de crédito consignado", prazoCarencia: 0,
+    beneficios: ["Quita saldo devedor em caso de morte", "Cobre desemprego involuntário", "Invalidez total"],
+    vantagens: ["Embutido na proposta", "Zero carência", "Aprovação automática"],
+    taxaConversao: 82.4,
+  },
+  {
+    id: "seg003", tipo: "Residencial", nome: "Lar Seguro VBT", seguradora: "Porto Seguro",
+    api: "Porto API v4", status: "parcial", comissaoBase: 12.0,
+    premioMin: 49.90, premioMax: 399.90, cobertura: 200000,
+    contratosMes: 18, producaoMes: 5400, comissaoMes: 648.00,
+    publico: "Proprietários e locatários", prazoCarencia: 30,
+    beneficios: ["Incêndio e explosão", "Roubo e furto", "Danos elétricos", "Responsabilidade civil"],
+    vantagens: ["Vistoria digital", "Acionamento 24h", "App de sinistro"],
+    taxaConversao: 22.8,
+  },
+  {
+    id: "seg004", tipo: "Saúde", nome: "VerbaTech Saúde", seguradora: "Amil",
+    api: "Amil API v1", status: "em_implantacao", comissaoBase: 15.0,
+    premioMin: 189.90, premioMax: 899.90, cobertura: null,
+    contratosMes: 0, producaoMes: 0, comissaoMes: 0,
+    publico: "Pessoa física ativa", prazoCarencia: 180,
+    beneficios: ["Consultas ambulatoriais", "Exames", "Internação", "Pronto-socorro"],
+    vantagens: ["Cobertura nacional", "Telemedicina inclusa", "Rede credenciada ampla"],
+    taxaConversao: 0,
+  },
+  {
+    id: "seg005", tipo: "Odontológico", nome: "VBT Odonto", seguradora: "OdontoPrev",
+    api: "OdontoPrev API v2", status: "online", comissaoBase: 10.0,
+    premioMin: 24.90, premioMax: 89.90, cobertura: null,
+    contratosMes: 31, producaoMes: 1980, comissaoMes: 198.00,
+    publico: "Pessoa física e dependentes", prazoCarencia: 90,
+    beneficios: ["Consultas e procedimentos básicos", "Ortodontia parcial", "Próteses"],
+    vantagens: ["Maior rede do Brasil", "Sem limite de uso", "App de agendamento"],
+    taxaConversao: 29.3,
+  },
+];
+
+export const mockSegurosPipeline = [
+  { id: "sp001", cliente: "João Silveira", cpf: "xxx.456.xxx-89", tipo: "Prestamista", seguradora: "Tokio Marine", premio: 1.20, status: "aprovado", digitador: "Ana Paula Santos", data: "2024-04-29" },
+  { id: "sp002", cliente: "Maria Ferreira", cpf: "xxx.789.xxx-12", tipo: "Vida", seguradora: "SulAmérica", premio: 89.90, status: "analise", digitador: "Carlos Mendes", data: "2024-04-29" },
+  { id: "sp003", cliente: "Pedro Oliveira", cpf: "xxx.123.xxx-45", tipo: "Residencial", seguradora: "Porto Seguro", premio: 149.90, status: "pendente_doc", digitador: "Fernanda Lima", data: "2024-04-28" },
+  { id: "sp004", cliente: "Lucia Ramos", cpf: "xxx.321.xxx-67", tipo: "Odontológico", seguradora: "OdontoPrev", premio: 49.90, status: "aprovado", digitador: "Ana Paula Santos", data: "2024-04-28" },
+  { id: "sp005", cliente: "Carlos Dias", cpf: "xxx.654.xxx-90", tipo: "Prestamista", seguradora: "Tokio Marine", premio: 0.90, status: "recusado", digitador: "Roberto Alves", data: "2024-04-27" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// CAMPANHAS — CRM Automation / WhatsApp
+// ─────────────────────────────────────────────────────────────
+export const mockCampanhas = [
+  {
+    id: "camp001", nome: "Renovação INSS Abril", tipo: "whatsapp", status: "ativa",
+    publico: "Clientes com contrato vencendo em 60 dias", total: 342, enviados: 289, abertos: 201,
+    convertidos: 44, dataInicio: "2024-04-15", dataFim: "2024-04-30",
+    taxaAbertura: 69.6, taxaConversao: 21.9, producaoGerada: 638000,
+    template: "Olá {nome}! Seu contrato consignado vence em breve. Temos condições especiais de renovação. Clique para simular: {link}",
+    segmentacao: ["INSS", "Contrato ativo", ">= 60 anos"],
+  },
+  {
+    id: "camp002", nome: "Cross-sell RMC", tipo: "sms", status: "ativa",
+    publico: "Clientes sem cartão RMC com margem disponível", total: 187, enviados: 187, abertos: 142,
+    convertidos: 18, dataInicio: "2024-04-20", dataFim: "2024-05-05",
+    taxaAbertura: 75.9, taxaConversao: 12.7, producaoGerada: 94000,
+    template: "VerbaTech: Você tem margem disponível para o Cartão RMC! Benefício sem sair de casa. Responda SIM para mais info.",
+    segmentacao: ["INSS", "Sem RMC", "Margem > R$200"],
+  },
+  {
+    id: "camp003", nome: "Prospecção FGTS", tipo: "whatsapp", status: "agendada",
+    publico: "CLT com mais de 2 anos de registro", total: 520, enviados: 0, abertos: 0,
+    convertidos: 0, dataInicio: "2024-05-02", dataFim: "2024-05-15",
+    taxaAbertura: 0, taxaConversao: 0, producaoGerada: 0,
+    template: "Olá {nome}! Sabia que você pode antecipar seu FGTS sem comprometer sua margem? Simule agora: {link}",
+    segmentacao: ["CLT ativo", "FGTS > R$3.000", "> 2 anos registro"],
+  },
+  {
+    id: "camp004", nome: "Reativação Inativos", tipo: "email", status: "concluida",
+    publico: "Clientes sem proposta nos últimos 90 dias", total: 215, enviados: 215, abertos: 89,
+    convertidos: 12, dataInicio: "2024-03-01", dataFim: "2024-03-15",
+    taxaAbertura: 41.4, taxaConversao: 13.5, producaoGerada: 178000,
+    template: "Sentimos sua falta! Confira nossas novas condições de crédito consignado com taxas a partir de 1,66% a.m.",
+    segmentacao: ["Sem proposta 90d", "Score > 550"],
+  },
+];
+
+export const mockProspects = [
+  { id: "pr001", nome: "Antônio Barros", cpf: "xxx.111.xxx-22", origem: "whatsapp", produto: "Consignado INSS", status: "quente", score: 720, margem: 850, ultimoContato: "2024-04-29", digitador: "Ana Paula Santos" },
+  { id: "pr002", nome: "Sônia Pinto", cpf: "xxx.222.xxx-33", origem: "indicacao", produto: "FGTS", status: "morno", score: 640, margem: null, ultimoContato: "2024-04-28", digitador: "Carlos Mendes" },
+  { id: "pr003", nome: "Gilberto Souza", cpf: "xxx.333.xxx-44", origem: "sms", produto: "RMC", status: "frio", score: 580, margem: 320, ultimoContato: "2024-04-26", digitador: "Fernanda Lima" },
+  { id: "pr004", nome: "Vera Campos", cpf: "xxx.444.xxx-55", origem: "whatsapp", produto: "Consignado INSS", status: "quente", score: 780, margem: 1200, ultimoContato: "2024-04-30", digitador: "Ana Paula Santos" },
+  { id: "pr005", nome: "Renato Lima", cpf: "xxx.555.xxx-66", origem: "landing_page", produto: "Pessoal", status: "morno", score: 620, margem: null, ultimoContato: "2024-04-27", digitador: "Roberto Alves" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// SEGURANÇA — 2FA, Logs, Restrições
+// ─────────────────────────────────────────────────────────────
+export const mockUsuariosSistema = [
+  {
+    id: "usr001", nome: "Ricardo Mendes", cpf: "001.xxx.xxx-01", email: "ricardo@verbatech.com.br",
+    role: "master", masterId: null, loja: "Matriz SP", status: "ativo",
+    twoFA: true, twoFAMetodo: "app", ultimoLogin: "2024-04-30 09:12",
+    ip: "192.168.1.10", sessoes: 3, tentativasFalhas: 0,
+    restricaoIP: ["192.168.1.0/24"], horarioPermitido: "06:00-22:00",
+    permissoes: ["dashboard", "corban", "financeiro", "compliance", "relatorios", "usuarios", "campanhas"],
+  },
+  {
+    id: "usr002", nome: "Ana Paula Santos", cpf: "045.xxx.xxx-12", email: "ana@verbatech.com.br",
+    role: "agente", masterId: "c001", loja: "SP-Centro", status: "ativo",
+    twoFA: true, twoFAMetodo: "sms", ultimoLogin: "2024-04-30 08:45",
+    ip: "187.12.34.56", sessoes: 1, tentativasFalhas: 0,
+    restricaoIP: [], horarioPermitido: "07:00-20:00",
+    permissoes: ["dashboard", "esteira", "propostas"],
+  },
+  {
+    id: "usr003", nome: "Carlos Mendes Silva", cpf: "067.xxx.xxx-34", email: "carlos.m@verbatech.com.br",
+    role: "agente", masterId: "c001", loja: "SP-Centro", status: "ativo",
+    twoFA: false, twoFAMetodo: null, ultimoLogin: "2024-04-29 17:22",
+    ip: "187.45.67.89", sessoes: 1, tentativasFalhas: 2,
+    restricaoIP: [], horarioPermitido: "07:00-20:00",
+    permissoes: ["dashboard", "esteira", "propostas"],
+  },
+  {
+    id: "usr004", nome: "Fernanda Lima", cpf: "089.xxx.xxx-56", email: "fernanda@verbatech.com.br",
+    role: "agente", masterId: "c001", loja: "SP-Pinheiros", status: "ativo",
+    twoFA: true, twoFAMetodo: "app", ultimoLogin: "2024-04-30 09:01",
+    ip: "189.23.45.67", sessoes: 1, tentativasFalhas: 0,
+    restricaoIP: [], horarioPermitido: "07:00-20:00",
+    permissoes: ["dashboard", "esteira", "propostas"],
+  },
+  {
+    id: "usr005", nome: "Roberto Alves", cpf: "012.xxx.xxx-78", email: "roberto@verbatech.com.br",
+    role: "agente", masterId: "c002", loja: "RJ-Zona Sul", status: "ativo",
+    twoFA: false, twoFAMetodo: null, ultimoLogin: "2024-04-29 16:30",
+    ip: "179.34.56.78", sessoes: 1, tentativasFalhas: 1,
+    restricaoIP: [], horarioPermitido: "08:00-19:00",
+    permissoes: ["dashboard", "esteira", "propostas"],
+  },
+  {
+    id: "usr006", nome: "Lucas Ferreira", cpf: "056.xxx.xxx-01", email: "lucas@verbatech.com.br",
+    role: "agente", masterId: "c003", loja: "BH-Savassi", status: "suspenso",
+    twoFA: false, twoFAMetodo: null, ultimoLogin: "2024-04-20 11:00",
+    ip: "200.45.67.89", sessoes: 0, tentativasFalhas: 5,
+    restricaoIP: [], horarioPermitido: "08:00-18:00",
+    permissoes: [],
+  },
+];
+
+export const mockActivityLog = [
+  { id: "act001", usuario: "Ricardo Mendes", acao: "Login realizado", ip: "192.168.1.10", dispositivo: "Chrome/Windows", data: "2024-04-30 09:12", status: "success", risco: "baixo" },
+  { id: "act002", usuario: "Ana Paula Santos", acao: "Proposta criada VBT-2024-089", ip: "187.12.34.56", dispositivo: "Safari/iPhone", data: "2024-04-30 08:50", status: "success", risco: "baixo" },
+  { id: "act003", usuario: "Carlos Mendes", acao: "Tentativa de login falhou (2FA incorreto)", ip: "187.45.67.89", dispositivo: "Chrome/Android", data: "2024-04-29 17:18", status: "warning", risco: "medio" },
+  { id: "act004", usuario: "Carlos Mendes", acao: "Login realizado após 2ª tentativa", ip: "187.45.67.89", dispositivo: "Chrome/Android", data: "2024-04-29 17:22", status: "success", risco: "baixo" },
+  { id: "act005", usuario: "Lucas Ferreira", acao: "5 tentativas de login falhas — conta suspensa", ip: "200.45.67.89", dispositivo: "Firefox/Linux", data: "2024-04-20 10:58", status: "error", risco: "alto" },
+  { id: "act006", usuario: "Desconhecido", acao: "Tentativa de acesso de IP bloqueado", ip: "45.33.32.156", dispositivo: "curl/bot", data: "2024-04-29 03:22", status: "error", risco: "alto" },
+  { id: "act007", usuario: "Ricardo Mendes", acao: "Relatório de produtividade exportado (PDF)", ip: "192.168.1.10", dispositivo: "Chrome/Windows", data: "2024-04-29 15:40", status: "success", risco: "baixo" },
+  { id: "act008", usuario: "Fernanda Lima", acao: "Cliente consultado: CPF xxx.089.xxx-56", ip: "189.23.45.67", dispositivo: "Chrome/Mac", data: "2024-04-30 09:05", status: "success", risco: "baixo" },
+  { id: "act009", usuario: "Sistema", acao: "Bloqueio automático IP fora de horário", ip: "45.33.32.157", dispositivo: "—", data: "2024-04-28 02:11", status: "error", risco: "alto" },
+  { id: "act010", usuario: "Ricardo Mendes", acao: "Usuário Carlos Mendes — alerta 2FA desativado", ip: "192.168.1.10", dispositivo: "Chrome/Windows", data: "2024-04-28 14:00", status: "warning", risco: "medio" },
+];
+
+export const mockIpRestrictions = [
+  { id: "ip001", descricao: "Rede Escritório SP", range: "192.168.1.0/24", tipo: "permitido", usuarios: ["Ricardo Mendes", "Ana Paula Santos"] },
+  { id: "ip002", descricao: "Escritório RJ", range: "187.12.34.0/24", tipo: "permitido", usuarios: ["Roberto Alves", "Patricia Costa"] },
+  { id: "ip003", descricao: "IP Bot Detectado", range: "45.33.32.0/24", tipo: "bloqueado", usuarios: [] },
+  { id: "ip004", descricao: "Tor Exit Node", range: "185.220.101.0/24", tipo: "bloqueado", usuarios: [] },
+];

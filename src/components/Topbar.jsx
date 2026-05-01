@@ -5,16 +5,20 @@ import { Bell, Eye, EyeOff, AlertTriangle, Zap, ChevronDown } from "lucide-react
 import { mockSession, mockKPIs, mockAlertasIA } from "../data/verbatechData";
 
 const PAGE_TITLES = {
-  "/":           { emoji: "📊", title: "Dashboard",        subtitle: "Visão geral da plataforma" },
-  "/esteira":    { emoji: "📋", title: "Esteira de Crédito", subtitle: "Pipeline · Digitação · Averbação" },
-  "/corban":     { emoji: "👥", title: "Corban CRM",        subtitle: "Hierarquia · Onboarding · Comissões" },
-  "/produtos":   { emoji: "📦", title: "Portfólio de Produtos", subtitle: "Consignado · FGTS · RMC/RCC · Pessoal" },
-  "/financeiro": { emoji: "💰", title: "Financeiro",        subtitle: "Conta Digital · Split · Extrato" },
-  "/compliance": { emoji: "🛡️", title: "Compliance & IA",  subtitle: "Engine Anti-Superendividamento · LGPD" },
-  "/credito":    { emoji: "💳", title: "Crédito",           subtitle: "Ofertas e simulações" },
-  "/reequilibrio":{ emoji: "⚖️", title: "Reequilíbrio",    subtitle: "Desendividamento" },
-  "/educacao":   { emoji: "🎓", title: "Educação",          subtitle: "Conteúdos financeiros" },
-  "/perfil":     { emoji: "👤", title: "Perfil",            subtitle: "Dados e configurações" },
+  "/":              { emoji: "📊", title: "Dashboard",           subtitle: "Visão geral da plataforma" },
+  "/esteira":       { emoji: "📋", title: "Esteira de Crédito",  subtitle: "Pipeline · Digitação · Averbação" },
+  "/corban":        { emoji: "👥", title: "Corban CRM",           subtitle: "Hierarquia · Onboarding · Comissões" },
+  "/produtos":      { emoji: "📦", title: "Portfólio de Produtos",subtitle: "Consignado · FGTS · RMC/RCC · Pessoal" },
+  "/financeiro":    { emoji: "💰", title: "Financeiro",           subtitle: "Conta Digital · Split · Extrato" },
+  "/compliance":    { emoji: "🛡️", title: "Compliance & IA",     subtitle: "Engine Anti-Superendividamento · LGPD" },
+  "/credito":       { emoji: "💳", title: "Crédito",              subtitle: "Ofertas e simulações" },
+  "/reequilibrio":  { emoji: "⚖️", title: "Reequilíbrio",        subtitle: "Desendividamento" },
+  "/educacao":      { emoji: "🎓", title: "Educação",             subtitle: "Conteúdos financeiros" },
+  "/perfil":        { emoji: "👤", title: "Perfil",               subtitle: "Dados e configurações" },
+  "/produtividade": { emoji: "📈", title: "Produtividade",        subtitle: "Ranking digitadores · Conversão · PDF" },
+  "/seguros":       { emoji: "🛡️", title: "Seguros",              subtitle: "Vida · Prestamista · Residencial · Saúde" },
+  "/campanhas":     { emoji: "📲", title: "Campanhas & CRM",      subtitle: "WhatsApp · SMS · E-mail · Prospects" },
+  "/seguranca":     { emoji: "🔒", title: "Segurança & Acesso",   subtitle: "2FA · Logs · IP/Horário · CPF vinculado" },
 };
 
 const fmt = (v) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
