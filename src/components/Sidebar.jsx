@@ -6,6 +6,7 @@ import {
   BarChart2, HeartHandshake, Send, Lock,
 } from "lucide-react";
 import { mockSession, mockKPIs, mockComissoes } from "../data/verbatechData";
+import { useAuth } from "../context/AuthContext";
 
 const NAV_ITEMS = [
   { path: "/",               label: "Dashboard",      icon: LayoutDashboard, color: "#6366F1" },
@@ -65,11 +66,19 @@ function Sparkline({ data, color }) {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const nivel     = mockSession.nivel;
-  const nivelCfg  = NIVEL_COLORS[nivel] || NIVEL_COLORS.Ouro;
+  const { user, logout } = useAuth();
+
+  // usa dados do usuário logado ou fallback para mockSession
+  const nivel    = user?.nivel || mockSession.nivel;
+  const nivelCfg = NIVEL_COLORS[nivel] || NIVEL_COLORS.Ouro;
+  const userName = user?.nome || mockSession.name;
+  const userRole = user?.role || mockSession.role;
+  const userComissao = user?.comissaoMes || mockSession.comissaoMes;
 
   // build sparkline data from comissoes
   const sparkData = mockComissoes?.mes?.map(m => m.comissao) || [8000, 9200, 10500, 11800, 13200, 14600];
+
+  function handleLogout() { logout(); navigate("/login"); }
 
   return (
     <div style={{
@@ -111,11 +120,11 @@ export default function Sidebar() {
             fontSize: 15, fontWeight: 900, color: nivelCfg.color,
             boxShadow: `0 0 12px ${nivelCfg.glow}`,
           }}>
-            {mockSession.name.charAt(0)}
+            {userName.charAt(0)}
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {mockSession.name}
+              {userName}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
               <span style={{
@@ -126,7 +135,7 @@ export default function Sidebar() {
               }}>
                 {nivel.toUpperCase()}
               </span>
-              <span style={{ fontSize: 10, color: "#64748B", textTransform: "capitalize" }}>{mockSession.role}</span>
+              <span style={{ fontSize: 10, color: "#64748B", textTransform: "capitalize" }}>{userRole}</span>
             </div>
           </div>
         </div>
@@ -141,7 +150,7 @@ export default function Sidebar() {
           <div>
             <div style={{ fontSize: 9, color: "#475569", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Comissão / mês</div>
             <div style={{ fontSize: 14, fontWeight: 900, color: "#4ADE80", marginTop: 1 }}>
-              {fmt(mockSession.comissaoMes)}
+              {fmt(userComissao)}
             </div>
           </div>
           <Sparkline data={sparkData} color="#4ADE80" />
@@ -212,16 +221,16 @@ export default function Sidebar() {
           Sistema
         </div>
         {[
-          { label: "Configurações", icon: Settings },
-          { label: "Sair",          icon: LogOut   },
-        ].map(({ label, icon: Icon }) => (
-          <button key={label} style={{
+          { label: "Configurações", icon: Settings, onClick: null },
+          { label: "Sair",          icon: LogOut,   onClick: handleLogout },
+        ].map(({ label, icon: Icon, onClick }) => (
+          <button key={label} onClick={onClick} style={{
             width: "100%", display: "flex", alignItems: "center", gap: 10,
             padding: "9px 10px", borderRadius: 9, marginBottom: 2,
             background: "transparent", border: "1px solid transparent",
             cursor: "pointer", transition: "all 0.15s",
           }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+            onMouseEnter={e => e.currentTarget.style.background = label === "Sair" ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.04)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
           >
             <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
