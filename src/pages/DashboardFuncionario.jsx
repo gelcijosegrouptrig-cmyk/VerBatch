@@ -19,7 +19,7 @@ import {
 
 /* ── tokens ─────────────────────────────── */
 const S = {
-  page:  { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  page:  { padding: 24 },
   card:  { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
 };
@@ -373,10 +373,7 @@ export default function DashboardFuncionario() {
   function handleLogout() { logout(); navigate("/login"); }
 
   return (
-    <div style={{ minHeight:"100vh", background:"#080E1A" }}>
-      <FuncTopbar user={user} onLogout={handleLogout} onNovaProposta={()=>setShowModal(true)} />
-
-      <div style={S.page}>
+    <div className="page">
         {/* ── Boas vindas ── */}
         <div style={{ marginBottom:24,
           background:"linear-gradient(135deg,rgba(16,185,129,0.12),rgba(6,182,212,0.06))",
@@ -584,7 +581,6 @@ export default function DashboardFuncionario() {
             </div>
           </div>
         </div>
-      </div>
 
       {showModal && <NovaProposta onClose={()=>setShowModal(false)}/>}
 

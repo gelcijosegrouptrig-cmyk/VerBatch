@@ -14,7 +14,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 
 /* ── tokens ─────────────────────────────────── */
 const S = {
-  page: { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  page: { padding: 24 },
   card: { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
 };
@@ -453,7 +453,7 @@ export default function Corban() {
   const chartData = mockComissoes?.mes || [];
 
   return (
-    <div style={S.page}>
+    <div className="page">
       {showModal && <OnboardingModal onClose={() => setShowModal(false)} />}
 
       {/* Header */}

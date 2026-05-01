@@ -12,7 +12,7 @@ import {
 } from "../data/verbatechData";
 
 const S = {
-  page: { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  page: { padding: 24 },
   card: { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
 };
@@ -458,7 +458,7 @@ export default function Compliance() {
   ];
 
   return (
-    <div style={S.page}>
+    <div className="page">
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22, flexWrap: "wrap", gap: 16 }}>
         <div>
