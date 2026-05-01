@@ -16,7 +16,7 @@ import {
 
 /* ── tokens ─────────────────────────────────────── */
 const S = {
-  page:  { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  page:  { padding: 24 },
   card:  { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
   h2:    { fontSize: 15, fontWeight: 700, color: "#F1F5F9", margin: 0 },
@@ -108,7 +108,7 @@ export default function FIDC() {
   ];
 
   return (
-    <div style={S.page}>
+    <div className="page">
 
       {/* ── Header ── */}
       <div style={{

@@ -18,7 +18,7 @@ import {
 
 /* ── shared style tokens ─────────────────────── */
 const S = {
-  page: { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  page: { padding: 24 },
   card: {
     background: "rgba(255,255,255,0.025)",
     border: "1px solid rgba(255,255,255,0.07)",
@@ -350,7 +350,7 @@ export default function Dashboard({ showBalance }) {
   ];
 
   return (
-    <div style={S.page}>
+    <div className="page">
 
       {/* ── Welcome Banner ── */}
       <WelcomeBanner navigate={navigate} />

@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 const S = {
-  page:  { padding: 28, minHeight: "100vh", background: "#05080F" },
+  page:  { padding: 28, background: "#05080F" },
   card:  { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 24 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 },
   title: { fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 4 },
@@ -529,7 +529,7 @@ export default function Configuracoes() {
   const [activeTab, setActiveTab] = useState("perfil");
 
   return (
-    <div style={S.page}>
+    <div className="page">
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>

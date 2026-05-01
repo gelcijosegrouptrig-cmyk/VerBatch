@@ -18,7 +18,7 @@ import {
 
 /* ── tokens ─────────────────────────────── */
 const S = {
-  page:  { padding: 28, minHeight: "100vh", background: "#05080F" },
+  page:  { padding: 28, background: "#05080F" },
   card:  { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14 },
   label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
 };
@@ -134,7 +134,7 @@ export default function DashboardAdmin() {
   const totalProd = mockGraficoProducao.reduce((a, m) => a + m.producao, 0);
 
   return (
-    <div style={S.page}>
+    <div className="page">
 
         {/* ── Boas vindas ── */}
         <div style={{ marginBottom: 24,

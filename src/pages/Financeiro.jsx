@@ -266,7 +266,7 @@ export default function Financeiro({ showBalance: propShow }) {
   ];
 
   return (
-    <div style={{ padding: 24, minHeight: "100vh", background: "#080E1A" }}>
+    <div className="page">
 
       {/* Header */}
       <div style={{ marginBottom: 22 }}>
