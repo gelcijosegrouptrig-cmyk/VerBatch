@@ -5,7 +5,6 @@ import Sidebar from "./components/Sidebar";
 import Topbar  from "./components/Topbar";
 
 /* ── Pages ─────────────────────────────────────────────── */
-import LandingPage          from "./pages/LandingPage";
 import Login                from "./pages/Login";
 import Dashboard            from "./pages/Dashboard";
 import Esteira              from "./pages/Esteira";
@@ -181,13 +180,12 @@ function FuncionarioShell() {
 function AppRouter() {
   const { user } = useAuth();
 
-  /* Não autenticado → landing + login */
+  /* Não autenticado → login em tela cheia */
   if (!user) {
     return (
       <Routes>
-        <Route path="/"      element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="*"      element={<Navigate to="/" replace />} />
+        <Route path="*"      element={<Navigate to="/login" replace />} />
       </Routes>
     );
   }
