@@ -1,305 +1,305 @@
+// VerbaTech — Perfil (Dark Theme v2 + AuthContext integration)
 import { useState } from "react";
-import { mockUser, mockDividas } from "../data/mockData";
+import { useNavigate } from "react-router-dom";
 import {
   Shield, Bell, ChevronRight, LogOut, Eye, EyeOff,
   Lock, User, FileText, HelpCircle, Star, CreditCard,
   TrendingUp, Settings, CheckCircle, AlertTriangle,
-  Smartphone, Key, Download, ExternalLink, Copy
+  Smartphone, Key, Download, ExternalLink, Copy,
+  Award, MapPin, Phone, Mail, Building2
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { mockSession, fmt } from "../data/verbatechData";
 
+/* ── tokens ───────────────────────────────────────────── */
+const S = {
+  page:  { padding: 24, minHeight: "100vh", background: "#080E1A" },
+  card:  { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14 },
+  label: { fontSize: 10, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.7 },
+};
+
+const NIVEL_COLORS = {
+  Diamante: { color: "#00BFFF", glow: "rgba(0,191,255,0.4)" },
+  Ouro:     { color: "#FFD700", glow: "rgba(255,215,0,0.35)" },
+  Prata:    { color: "#C0C0C0", glow: "rgba(192,192,192,0.3)" },
+  Bronze:   { color: "#CD7F32", glow: "rgba(205,127,50,0.35)" },
+};
+
+/* ── MenuItem ─────────────────────────────────────────── */
 function MenuItem({ icon: Icon, label, value, onClick, danger, badge, color }) {
-  const c = color || (danger ? "#F87171" : "var(--text-3)");
+  const c = color || (danger ? "#F87171" : "#64748B");
   return (
-    <div
-      onClick={onClick}
-      style={{
-        display: "flex", alignItems: "center", gap: 14,
-        padding: "13px 16px", cursor: "pointer",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-        transition: "background .15s",
-      }}
+    <div onClick={onClick} style={{
+      display: "flex", alignItems: "center", gap: 12,
+      padding: "12px 16px", cursor: "pointer",
+      borderBottom: "1px solid rgba(255,255,255,0.04)",
+      transition: "background .15s",
+    }}
       onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
     >
-      <div style={{
-        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-        background: danger ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.06)",
-        border: danger ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(255,255,255,0.07)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <Icon size={16} color={c} />
+      <div style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: danger ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${danger ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Icon size={15} color={c} />
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: danger ? "#F87171" : "var(--text-2)" }}>{label}</div>
-        {value && <div style={{ fontSize: 11, color: "var(--text-4)", marginTop: 2 }}>{value}</div>}
+        <div style={{ fontSize: 13, fontWeight: 600, color: danger ? "#F87171" : "#E2E8F0" }}>{label}</div>
+        {value && <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>{value}</div>}
       </div>
       {badge && (
-        <div style={{
-          background: "rgba(239,68,68,0.8)", color: "white",
-          fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
-        }}>{badge}</div>
+        <span style={{ background: "rgba(239,68,68,0.8)", color: "#fff", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 20 }}>{badge}</span>
       )}
-      <ChevronRight size={14} color="var(--text-4)" />
+      <ChevronRight size={13} color="#334155" />
     </div>
   );
 }
 
-function SectionCard({ title, icon: Icon, iconColor = "var(--text-3)", children }) {
+/* ── Section Card ─────────────────────────────────────── */
+function SectionCard({ title, icon: Icon, iconColor = "#64748B", children }) {
   return (
-    <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-      <div style={{
-        padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-        display: "flex", alignItems: "center", gap: 9,
-      }}>
-        <Icon size={14} color={iconColor} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 0.7 }}>
-          {title}
-        </span>
+    <div style={{ ...S.card, padding: 0, overflow: "hidden" }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 8 }}>
+        <Icon size={13} color={iconColor} />
+        <span style={{ ...S.label }}>{title}</span>
       </div>
       {children}
     </div>
   );
 }
 
+/* ── MAIN ─────────────────────────────────────────────── */
 export default function Perfil({ showBalance }) {
-  const [show, setShow] = useState(showBalance);
-  const totalDividas = mockDividas.reduce((s, d) => s + d.saldo, 0);
-  const totalParcelas = mockDividas.reduce((s, d) => s + d.parcela, 0);
-  const fmt = (v) => show
-    ? `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
-    : "R$ ••••••";
+  const navigate        = useNavigate();
+  const { user, logout } = useAuth();
+  const [show, setShow] = useState(showBalance ?? true);
 
-  const scoreColor =
-    mockUser.score >= 80 ? "var(--green)" :
-    mockUser.score >= 60 ? "var(--orange)" : "#F87171";
+  // Use authenticated user or fallback to mockSession
+  const u = user || {
+    nome: mockSession.name, role: mockSession.role, nivel: mockSession.nivel,
+    empresa: mockSession.empresa, cnpj: mockSession.cnpj, telefone: mockSession.telefone,
+    email: mockSession.email, saldoConta: mockSession.saldoConta,
+    comissaoMes: mockSession.comissaoMes, comissaoPendente: mockSession.comissaoPendente,
+    twoFA: true, twoFAMetodo: "app", ultimoLogin: "2024-04-30 09:12",
+    loja: "Matriz — São Paulo/SP", avatar: "RM",
+  };
+
+  const nivelCfg   = NIVEL_COLORS[u.nivel] || NIVEL_COLORS.Ouro;
+  const initials   = (u.nome || "??").split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+  const fmtShow    = (v) => show ? fmt(v) : "R$ ••••••";
+
+  function handleLogout() { logout(); navigate("/login"); }
 
   return (
-    <div className="page">
+    <div style={S.page}>
+      {/* Header */}
+      <div style={{ marginBottom: 22 }}>
+        <h1 style={{ color: "#F1F5F9", fontWeight: 800, fontSize: 22, marginBottom: 4 }}>Meu Perfil</h1>
+        <p style={{ color: "#64748B", fontSize: 13 }}>Dados da conta · Segurança · Preferências</p>
+      </div>
 
-      {/* ── MAIN LAYOUT ─────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 20 }}>
+      {/* Main grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 20 }}>
 
-        {/* LEFT: Perfil card + Resumo */}
+        {/* LEFT: Identidade + Financeiro */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-          {/* Card de identidade */}
+          {/* Identity card */}
           <div style={{
-            background: "linear-gradient(135deg,rgba(124,58,237,0.15) 0%,rgba(0,200,150,0.08) 100%)",
-            border: "1px solid rgba(124,58,237,0.25)",
-            borderRadius: "var(--radius)", padding: 24,
-            position: "relative", overflow: "hidden",
+            background: `linear-gradient(135deg,${nivelCfg.color}18 0%,rgba(99,102,241,0.08) 100%)`,
+            border: `1px solid ${nivelCfg.color}30`, borderRadius: 14, padding: 22, position: "relative", overflow: "hidden",
           }}>
-            {/* BG glow */}
-            <div style={{
-              position: "absolute", top: -50, right: -50,
-              width: 180, height: 180, borderRadius: "50%",
-              background: "radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%)",
-              pointerEvents: "none",
-            }} />
-            <div style={{
-              position: "absolute", bottom: -30, left: -30,
-              width: 120, height: 120, borderRadius: "50%",
-              background: "radial-gradient(circle,rgba(0,200,150,0.1),transparent 70%)",
-              pointerEvents: "none",
-            }} />
+            <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: `radial-gradient(circle,${nivelCfg.color}18,transparent 70%)`, pointerEvents: "none" }} />
 
             {/* Avatar + nome */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
               <div style={{
-                width: 64, height: 64, borderRadius: "50%",
-                background: "linear-gradient(135deg,#7C3AED,#00C896)",
+                width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
+                background: `linear-gradient(135deg,${nivelCfg.color}44,${nivelCfg.color}88)`,
+                border: `3px solid ${nivelCfg.color}55`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 22, fontWeight: 900, color: "white",
-                boxShadow: "0 6px 24px rgba(124,58,237,0.4)",
-                border: "3px solid rgba(255,255,255,0.1)",
-                flexShrink: 0,
+                fontSize: 22, fontWeight: 900, color: nivelCfg.color,
+                boxShadow: `0 6px 24px ${nivelCfg.glow}`,
               }}>
-                {mockUser.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                {initials}
               </div>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: "white", letterSpacing: -0.5 }}>{mockUser.name}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>
-                  CPF {mockUser.cpf}
-                </div>
-                <div style={{ marginTop: 7, display: "flex", gap: 6 }}>
-                  <span className="chip chip-green">INSS Ativo</span>
-                  <span className="chip chip-purple">Verificado</span>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "#F1F5F9" }}>{u.nome}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                  <span style={{ background: nivelCfg.color + "22", color: nivelCfg.color, border: `1px solid ${nivelCfg.color}44`, borderRadius: 5, padding: "1px 8px", fontSize: 10, fontWeight: 800, letterSpacing: 0.5, boxShadow: `0 0 8px ${nivelCfg.glow}` }}>
+                    {(u.nivel || "").toUpperCase()}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#64748B", textTransform: "capitalize" }}>{u.role}</span>
                 </div>
               </div>
             </div>
 
-            {/* Dados bancários */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {/* Info grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
               {[
-                { l: "Matrícula", v: mockUser.matricula },
-                { l: "Tipo", v: mockUser.tipo },
-                { l: "Score", v: `${mockUser.score} pts`, color: scoreColor },
-                { l: "Limite", v: show ? "R$ 15.000" : "R$ ••••", color: "var(--green)" },
-              ].map(({ l, v, color }) => (
-                <div key={l} style={{
-                  background: "rgba(255,255,255,0.06)", borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  padding: "10px 12px",
-                }}>
-                  <div style={{ fontSize: 9.5, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4, fontWeight: 700 }}>{l}</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: color || "white" }}>{v}</div>
+                { l: "Empresa",   v: u.empresa || "—" },
+                { l: "Loja",      v: u.loja || "—" },
+                { l: "E-mail",    v: u.email || "—" },
+                { l: "Telefone",  v: u.telefone || "—" },
+              ].map(({ l, v }) => (
+                <div key={l} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "9px 11px" }}>
+                  <div style={{ ...S.label, marginBottom: 3 }}>{l}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#CBD5E1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{v}</div>
                 </div>
               ))}
             </div>
 
-            {/* Toggle balance */}
-            <button
-              onClick={() => setShow(s => !s)}
-              style={{
-                marginTop: 16, width: "100%",
-                background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 10, padding: "9px", color: "rgba(255,255,255,0.5)",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "background .15s",
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.12)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
-            >
-              {show ? <EyeOff size={14} /> : <Eye size={14} />}
-              {show ? "Ocultar valores" : "Mostrar valores"}
+            {/* Badges */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+              <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 20, background: "rgba(74,222,128,0.12)", color: "#4ADE80", border: "1px solid rgba(74,222,128,0.25)", fontWeight: 700 }}>✓ Verificado</span>
+              <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 20, background: "rgba(56,189,248,0.12)", color: "#38BDF8", border: "1px solid rgba(56,189,248,0.25)", fontWeight: 700 }}>LGPD OK</span>
+              {u.twoFA && <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 20, background: "rgba(99,102,241,0.12)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.25)", fontWeight: 700 }}>2FA Ativo</span>}
+            </div>
+
+            <button onClick={() => setShow(s => !s)} style={{ width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, padding: "9px", color: "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+              {show ? <EyeOff size={13} /> : <Eye size={13} />}
+              {show ? "Ocultar saldos" : "Mostrar saldos"}
             </button>
           </div>
 
           {/* Resumo financeiro */}
-          <div className="card">
-            <div className="section-title">
-              <TrendingUp size={13} color="var(--text-3)" />
-              Resumo Financeiro
+          <div style={{ ...S.card, padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <TrendingUp size={14} color="#818CF8" />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>Resumo Financeiro</span>
             </div>
-
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {[
-                { l: "Salário Líquido",     v: fmt(mockUser.salarioLiquido),   color: "var(--green)" },
-                { l: "Margem Disponível",   v: fmt(mockUser.margemDisponivel), color: "var(--green)" },
-                { l: "Margem Usada",        v: fmt(mockUser.margemUsada),      color: "var(--orange)" },
-                { l: "Total de Dívidas",    v: fmt(totalDividas),              color: "#F87171" },
-                { l: "Parcelas Mensais",    v: fmt(totalParcelas),             color: "#F87171" },
+                { l: "Saldo em Conta",       v: fmtShow(u.saldoConta || 0),          color: "#38BDF8" },
+                { l: "Comissão do Mês",      v: fmtShow(u.comissaoMes || 0),         color: "#4ADE80" },
+                { l: "Comissão Pendente",    v: fmtShow(u.comissaoPendente || 0),     color: "#FCD34D" },
               ].map(({ l, v, color }) => (
-                <div key={l} style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
-                }}>
-                  <span style={{ fontSize: 13, color: "var(--text-3)" }}>{l}</span>
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <span style={{ fontSize: 12, color: "#64748B" }}>{l}</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color }}>{v}</span>
                 </div>
               ))}
             </div>
 
-            {/* Score visual */}
-            <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
-                <svg width="64" height="64" viewBox="0 0 64 64">
-                  <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
-                  <circle cx="32" cy="32" r="24" fill="none"
-                    stroke={scoreColor} strokeWidth="7"
-                    strokeDasharray={`${2 * Math.PI * 24 * (mockUser.score / 100)} ${2 * Math.PI * 24}`}
-                    strokeLinecap="round"
-                    transform="rotate(-90 32 32)"
-                  />
-                </svg>
-                <div style={{
-                  position: "absolute", inset: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, fontWeight: 900, color: scoreColor,
-                }}>
-                  {mockUser.score}
-                </div>
+            {/* Último login */}
+            <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 6px #4ADE80" }} />
+              <span style={{ fontSize: 11, color: "#475569" }}>Último acesso: {u.ultimoLogin}</span>
+            </div>
+          </div>
+
+          {/* 2FA Status */}
+          <div style={{ ...S.card, padding: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: u.twoFA ? "rgba(74,222,128,0.12)" : "rgba(239,68,68,0.12)", border: `1px solid ${u.twoFA ? "rgba(74,222,128,0.25)" : "rgba(239,68,68,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {u.twoFA ? <Shield size={18} color="#4ADE80" /> : <AlertTriangle size={18} color="#EF4444" />}
               </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-2)" }}>Score {mockUser.scoreLabel}</div>
-                <div style={{ fontSize: 11, color: "var(--text-4)", marginTop: 2, lineHeight: 1.5 }}>
-                  Aumente pagando dívidas em dia e usando crédito com moderação
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: u.twoFA ? "#4ADE80" : "#EF4444", marginBottom: 3 }}>
+                  {u.twoFA ? `2FA Ativo — ${u.twoFAMetodo === "app" ? "Aplicativo Autenticador" : "SMS"}` : "2FA não configurado"}
+                </div>
+                <div style={{ fontSize: 11, color: "#64748B" }}>
+                  {u.twoFA ? "Conta protegida contra acessos não autorizados" : "Ative agora para proteger sua conta"}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Menus */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* RIGHT: Menu sections */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-          {/* Status de verificação */}
-          <div style={{
-            background: "rgba(0,200,150,0.06)", border: "1px solid rgba(0,200,150,0.2)",
-            borderRadius: "var(--radius)", padding: "14px 20px",
-            display: "flex", alignItems: "center", gap: 14,
-          }}>
-            <CheckCircle size={22} color="var(--green)" style={{ flexShrink: 0 }} />
-            <div>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--green)", marginBottom: 2 }}>Conta verificada e ativa</div>
-              <div style={{ fontSize: 12, color: "var(--text-4)" }}>
-                Biometria facial confirmada · CPF válido · INSS ativo · LGPD consentida em 01/04/2026
+          {/* Status banner */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 12, padding: "14px 20px" }}>
+            <CheckCircle size={22} color="#4ADE80" style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#4ADE80", marginBottom: 2 }}>Conta verificada e ativa</div>
+              <div style={{ fontSize: 11, color: "#64748B" }}>
+                Biometria confirmada · CPF válido · LGPD consentida em 01/04/2026 · Regulado BCB
               </div>
             </div>
-            <button className="btn btn-outline" style={{ padding: "7px 16px", fontSize: 12, flexShrink: 0 }}>
+            <button style={{ background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, color: "#4ADE80", fontSize: 11, fontWeight: 700, padding: "7px 14px", cursor: "pointer" }}>
               Ver detalhes
             </button>
           </div>
 
-          {/* Grid 2x2 menus */}
+          {/* 2x2 grid */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
-            {/* Conta */}
-            <SectionCard title="Minha Conta" icon={User} iconColor="var(--blue-lt)">
-              <MenuItem icon={User}     label="Dados pessoais"     value={`${mockUser.name} · CPF ${mockUser.cpf}`} />
-              <MenuItem icon={FileText} label="Comprovantes"        value="Extratos e contratos" />
-              <MenuItem icon={Download} label="Exportar dados"      value="PDF · CSV" />
-              <MenuItem icon={Copy}     label="Matrícula INSS"      value={mockUser.matricula} badge={null} />
+            <SectionCard title="Minha Conta" icon={User} iconColor="#38BDF8">
+              <MenuItem icon={User}        label="Dados pessoais"      value={`${u.nome} · ${u.cnpj || "—"}`} />
+              <MenuItem icon={Building2}   label="Empresa / Loja"      value={u.empresa} />
+              <MenuItem icon={FileText}    label="Comprovantes"        value="Contratos e extratos" />
+              <MenuItem icon={Download}    label="Exportar dados"      value="PDF · CSV" />
             </SectionCard>
 
-            {/* Segurança */}
-            <SectionCard title="Segurança" icon={Shield} iconColor="var(--green)">
-              <MenuItem icon={Key}          label="Alterar senha"          value="Última alteração há 30 dias" />
-              <MenuItem icon={Smartphone}   label="Biometria facial"       value="Ativa e configurada" color="var(--green)" />
-              <MenuItem icon={Lock}         label="Autenticação em 2 fatores" value="SMS ativo" />
-              <MenuItem icon={AlertTriangle} label="Dispositivos conectados" value="1 dispositivo ativo" />
+            <SectionCard title="Segurança" icon={Shield} iconColor="#4ADE80">
+              <MenuItem icon={Key}          label="Alterar senha"              value="Última alteração há 30 dias" />
+              <MenuItem icon={Smartphone}   label="Biometria facial"           value="Ativa e configurada"         color="#4ADE80" />
+              <MenuItem icon={Lock}         label="2FA — Autenticação dupla"   value={u.twoFA ? `${u.twoFAMetodo === "app" ? "App Autenticador" : "SMS"} ativo` : "Não configurado"} color={u.twoFA ? "#4ADE80" : "#EF4444"} />
+              <MenuItem icon={AlertTriangle} label="Dispositivos conectados"   value="1 dispositivo ativo" />
             </SectionCard>
 
-            {/* Financeiro */}
-            <SectionCard title="Financeiro" icon={CreditCard} iconColor="var(--orange)">
-              <MenuItem icon={CreditCard} label="Meus contratos"    value={`${mockDividas.length} contratos ativos`} />
-              <MenuItem icon={TrendingUp} label="Extrato completo"  value="Últimos 12 meses" />
-              <MenuItem icon={Star}       label="Programa de pontos" value={`130 pts acumulados`} color="var(--yellow)" />
-              <MenuItem icon={Bell}       label="Alertas financeiros" value="5 alertas configurados" badge="5" />
+            <SectionCard title="Financeiro" icon={CreditCard} iconColor="#F59E0B">
+              <MenuItem icon={CreditCard} label="Meus contratos"      value="Ver todas as propostas" />
+              <MenuItem icon={TrendingUp} label="Extrato de comissões" value="Últimos 12 meses" />
+              <MenuItem icon={Star}       label="Nível e gamificação" value={`${u.nivel} · 12.840 pts`}   color={nivelCfg.color} />
+              <MenuItem icon={Bell}       label="Alertas e notificações" value="5 alertas configurados"   badge="5" />
             </SectionCard>
 
-            {/* Suporte */}
-            <SectionCard title="Suporte & Legal" icon={HelpCircle} iconColor="var(--purple-lt)">
-              <MenuItem icon={HelpCircle}    label="Central de ajuda"    value="FAQ · Chat · Telefone" />
-              <MenuItem icon={FileText}      label="Termos de uso"       value="Versão 2.1 · Ago/2025" />
-              <MenuItem icon={Shield}        label="Política de privacidade" value="LGPD compliant" />
-              <MenuItem icon={ExternalLink}  label="Banco Central"       value="Regulamentação BCB" />
+            <SectionCard title="Suporte & Legal" icon={HelpCircle} iconColor="#A78BFA">
+              <MenuItem icon={HelpCircle}   label="Central de ajuda"         value="FAQ · Chat · Telefone" />
+              <MenuItem icon={FileText}     label="Termos de uso"            value="Versão 2.1 · Ago/2025" />
+              <MenuItem icon={Shield}       label="Política de privacidade"  value="LGPD compliant" />
+              <MenuItem icon={ExternalLink} label="Banco Central"            value="Regulamentação BCB" />
             </SectionCard>
           </div>
 
-          {/* Logout */}
-          <div className="card" style={{ padding: "14px 18px" }}>
+          {/* CNPJ / identificação fiscal */}
+          <div style={{ ...S.card, padding: 18 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <Award size={15} color="#818CF8" />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>Identificação Fiscal</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+              {[
+                { l: "CNPJ", v: u.cnpj || "—" },
+                { l: "Loja", v: u.loja || "—" },
+                { l: "Nível", v: u.nivel || "—" },
+              ].map(({ l, v }) => (
+                <div key={l} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
+                  <div style={{ ...S.label, marginBottom: 4 }}>{l}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#E2E8F0" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sessão / logout */}
+          <div style={{ ...S.card, padding: "14px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)" }}>Sessão ativa</div>
-                <div style={{ fontSize: 11, color: "var(--text-4)", marginTop: 2 }}>
-                  Último acesso: hoje às 23:10 · IP 187.xxx.xxx.12
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#94A3B8" }}>Sessão ativa</div>
+                <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>
+                  Último acesso: {u.ultimoLogin} · IP protegido · Dispositivo verificado
                 </div>
               </div>
-              <button className="btn btn-danger" style={{ fontSize: 12, padding: "8px 18px" }}>
+              <button onClick={handleLogout} style={{
+                display: "flex", alignItems: "center", gap: 7, padding: "9px 18px",
+                background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)",
+                borderRadius: 9, color: "#F87171", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                transition: "all .2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.5)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.25)"; }}
+              >
                 <LogOut size={14} /> Sair da conta
               </button>
             </div>
           </div>
 
-          {/* Versão / Info */}
+          {/* Footer info */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 4px" }}>
-            <span style={{ fontSize: 11, color: "var(--text-4)" }}>
-              VerBatch Fintech v1.0.0 · Correspondente bancário regulado pelo BCB
-            </span>
-            <span style={{ fontSize: 11, color: "var(--text-4)" }}>
-              © 2026 VerBatch · LGPD · Privacidade
-            </span>
+            <span style={{ fontSize: 10, color: "#1E293B" }}>VerbaTech Corban Platform v2.0 · BCB regulado · LGPD compliant</span>
+            <span style={{ fontSize: 10, color: "#1E293B" }}>© 2026 VerbaTech · Política de Privacidade</span>
           </div>
         </div>
       </div>

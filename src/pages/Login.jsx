@@ -359,6 +359,7 @@ export default function Login() {
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     placeholder="seu@email.com"
+                    autoComplete="email"
                     required
                     style={{
                       width: "100%", padding: "12px 14px 12px 38px", borderRadius: 11,
@@ -385,6 +386,7 @@ export default function Login() {
                     type={showPass ? "text" : "password"} value={senha}
                     onChange={e => setSenha(e.target.value)}
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     required
                     style={{
                       width: "100%", padding: "12px 40px 12px 38px", borderRadius: 11,
