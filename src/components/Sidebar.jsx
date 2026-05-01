@@ -3,22 +3,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, GitPullRequest, Users, Package, DollarSign,
   Shield, Settings, LogOut, Zap, ChevronRight, TrendingUp,
-  BarChart2, HeartHandshake, Send, Lock,
+  BarChart2, HeartHandshake, Send, Lock, Landmark, FileText, PieChart,
 } from "lucide-react";
 import { mockSession, mockKPIs, mockComissoes } from "../data/verbatechData";
 import { useAuth } from "../context/AuthContext";
 
 const NAV_ITEMS = [
-  { path: "/",               label: "Dashboard",      icon: LayoutDashboard, color: "#6366F1" },
-  { path: "/esteira",        label: "Esteira",         icon: GitPullRequest,  color: "#8B5CF6", badge: 3 },
-  { path: "/corban",         label: "Corban CRM",      icon: Users,           color: "#06B6D4" },
-  { path: "/produtos",       label: "Produtos",        icon: Package,         color: "#10B981" },
-  { path: "/financeiro",     label: "Financeiro",      icon: DollarSign,      color: "#F59E0B" },
-  { path: "/compliance",     label: "Compliance & IA", icon: Shield,          color: "#EF4444", badge: 1 },
-  { path: "/produtividade",  label: "Produtividade",   icon: BarChart2,       color: "#A855F7" },
-  { path: "/seguros",        label: "Seguros",         icon: HeartHandshake,  color: "#EF4444" },
-  { path: "/campanhas",      label: "Campanhas",       icon: Send,            color: "#25D366", badge: 2 },
-  { path: "/seguranca",      label: "Segurança",       icon: Lock,            color: "#F59E0B", badge: 2 },
+  // ─── Core ───
+  { path: "/",               label: "Dashboard",      icon: LayoutDashboard, color: "#6366F1",  group: "core" },
+  { path: "/esteira",        label: "Esteira",         icon: GitPullRequest,  color: "#8B5CF6",  group: "core", badge: 3 },
+  { path: "/corban",         label: "Corban CRM",      icon: Users,           color: "#06B6D4",  group: "core" },
+  { path: "/produtos",       label: "Produtos",        icon: Package,         color: "#10B981",  group: "core" },
+  { path: "/financeiro",     label: "Financeiro",      icon: DollarSign,      color: "#F59E0B",  group: "core" },
+  { path: "/compliance",     label: "Compliance & IA", icon: Shield,          color: "#EF4444",  group: "core", badge: 1 },
+  // ─── BaaS ───
+  { path: "/baas",           label: "BaaS / Contas",   icon: Landmark,        color: "#818CF8",  group: "baas" },
+  { path: "/ccb",            label: "CCB / Contratos", icon: FileText,        color: "#10B981",  group: "baas" },
+  { path: "/fidc",           label: "FIDC / Fundo",    icon: PieChart,        color: "#F59E0B",  group: "baas" },
+  // ─── Gestão ───
+  { path: "/produtividade",  label: "Produtividade",   icon: BarChart2,       color: "#A855F7",  group: "gestao" },
+  { path: "/seguros",        label: "Seguros",          icon: HeartHandshake,  color: "#EF4444",  group: "gestao" },
+  { path: "/campanhas",      label: "Campanhas",        icon: Send,            color: "#25D366",  group: "gestao", badge: 2 },
+  { path: "/seguranca",      label: "Segurança",        icon: Lock,            color: "#F59E0B",  group: "gestao", badge: 2 },
 ];
 
 const NIVEL_COLORS = {
@@ -159,60 +165,77 @@ export default function Sidebar() {
 
       {/* ── Navigation ── */}
       <nav style={{ flex: 1, padding: "10px 10px 4px", overflowY: "auto" }}>
-        <div style={{ fontSize: 9, color: "#334155", fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", padding: "6px 8px 8px" }}>
-          Plataforma
-        </div>
-        {NAV_ITEMS.map(({ path, label, icon: Icon, color, badge }) => {
-          const active = location.pathname === path;
+
+        {/* Group labels + items */}
+        {[
+          { id: "core",   label: "Plataforma" },
+          { id: "baas",   label: "BaaS & Crédito" },
+          { id: "gestao", label: "Gestão" },
+        ].map(({ id, label }, gi) => {
+          const items = NAV_ITEMS.filter(n => n.group === id);
           return (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 10,
-                padding: "9px 10px 9px 13px", borderRadius: 9, marginBottom: 2,
-                background: active ? `${color}18` : "transparent",
-                border: `1px solid ${active ? color + "33" : "transparent"}`,
-                cursor: "pointer", transition: "all 0.15s", textAlign: "left",
-                position: "relative",
-                boxShadow: active ? `inset 0 0 20px ${color}08` : "none",
-              }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}
-            >
-              {/* Active left bar */}
-              {active && (
-                <div style={{
-                  position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
-                  width: 3, height: 18, borderRadius: "0 3px 3px 0",
-                  background: color, boxShadow: `0 0 8px ${color}`,
-                }} />
-              )}
+            <div key={id}>
               <div style={{
-                width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                background: active ? color + "22" : "rgba(255,255,255,0.05)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.15s",
-                boxShadow: active ? `0 0 10px ${color}44` : "none",
-              }}>
-                <Icon size={14} color={active ? color : "#475569"} />
-              </div>
-              <span style={{
-                fontSize: 13, fontWeight: active ? 700 : 500,
-                color: active ? "#F1F5F9" : "#64748B", flex: 1,
+                fontSize: 9, color: "#334155", fontWeight: 800, letterSpacing: 1.5,
+                textTransform: "uppercase", padding: gi === 0 ? "6px 8px 8px" : "14px 8px 8px",
+                marginTop: gi > 0 ? 4 : 0,
+                borderTop: gi > 0 ? "1px solid rgba(255,255,255,0.05)" : "none",
               }}>
                 {label}
-              </span>
-              {badge && !active && (
-                <span style={{
-                  background: "rgba(239,68,68,0.8)", color: "#fff",
-                  borderRadius: 10, padding: "1px 6px",
-                  fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center",
-                  boxShadow: "0 0 6px rgba(239,68,68,0.5)",
-                }}>{badge}</span>
-              )}
-              {active && <ChevronRight size={12} color={color} />}
-            </button>
+              </div>
+              {items.map(({ path, label: itemLabel, icon: Icon, color, badge }) => {
+                const active = location.pathname === path;
+                return (
+                  <button
+                    key={path}
+                    onClick={() => navigate(path)}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 10,
+                      padding: "9px 10px 9px 13px", borderRadius: 9, marginBottom: 2,
+                      background: active ? `${color}18` : "transparent",
+                      border: `1px solid ${active ? color + "33" : "transparent"}`,
+                      cursor: "pointer", transition: "all 0.15s", textAlign: "left",
+                      position: "relative",
+                      boxShadow: active ? `inset 0 0 20px ${color}08` : "none",
+                    }}
+                    onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+                    onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    {active && (
+                      <div style={{
+                        position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
+                        width: 3, height: 18, borderRadius: "0 3px 3px 0",
+                        background: color, boxShadow: `0 0 8px ${color}`,
+                      }} />
+                    )}
+                    <div style={{
+                      width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                      background: active ? color + "22" : "rgba(255,255,255,0.05)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.15s",
+                      boxShadow: active ? `0 0 10px ${color}44` : "none",
+                    }}>
+                      <Icon size={14} color={active ? color : "#475569"} />
+                    </div>
+                    <span style={{
+                      fontSize: 13, fontWeight: active ? 700 : 500,
+                      color: active ? "#F1F5F9" : "#64748B", flex: 1,
+                    }}>
+                      {itemLabel}
+                    </span>
+                    {badge && !active && (
+                      <span style={{
+                        background: "rgba(239,68,68,0.8)", color: "#fff",
+                        borderRadius: 10, padding: "1px 6px",
+                        fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center",
+                        boxShadow: "0 0 6px rgba(239,68,68,0.5)",
+                      }}>{badge}</span>
+                    )}
+                    {active && <ChevronRight size={12} color={color} />}
+                  </button>
+                );
+              })}
+            </div>
           );
         })}
 

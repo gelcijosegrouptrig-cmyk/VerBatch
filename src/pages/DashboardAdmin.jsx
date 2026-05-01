@@ -1,12 +1,9 @@
 // VerbaTech — Dashboard Admin (Gestão Global da Plataforma)
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
-  Crown, Users, DollarSign, TrendingUp, Shield, Zap, LogOut,
-  BarChart2, AlertTriangle, CheckCircle, XCircle, Settings,
-  Eye, RefreshCw, Globe, Lock, UserCheck, UserX, Activity,
-  ChevronRight, Building2, Database, Server, Wifi, ArrowUpRight,
-  FileText, Bell, Search, Filter, Package,
+  Crown, Users, DollarSign, TrendingUp, Shield, Zap,
+  AlertTriangle, Globe, Lock, Activity,
+  Building2, Server, ArrowUpRight,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -14,9 +11,9 @@ import {
 } from "recharts";
 import { useAuth } from "../context/AuthContext";
 import {
-  mockCorbans, mockKPIs, mockGraficoProducao, mockGraficoProdutos,
+  mockCorbans, mockGraficoProducao, mockGraficoProdutos,
   mockIntegracoes, mockActivityLog, mockUsuariosSistema,
-  mockSeguros, mockCampanhas, fmt, fmtPct,
+  mockCampanhas, fmt,
 } from "../data/verbatechData";
 
 /* ── tokens ─────────────────────────────── */
@@ -27,102 +24,6 @@ const S = {
 };
 
 const PIE_COLORS = ["#6366F1","#06B6D4","#F59E0B","#10B981","#EF4444","#8B5CF6"];
-
-/* ── Topbar Admin ───────────────────────── */
-function AdminTopbar({ user, onLogout }) {
-  const [showMenu, setShowMenu] = useState(false);
-  return (
-    <div style={{
-      height: 60, background: "rgba(5,8,15,0.95)",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
-      display: "flex", alignItems: "center",
-      padding: "0 28px", gap: 16, position: "sticky", top: 0, zIndex: 100,
-      backdropFilter: "blur(12px)",
-    }}>
-      {/* logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-        <div style={{ width: 30, height: 30, borderRadius: 9,
-          background: "linear-gradient(135deg,#EF4444,#DC2626)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 0 14px rgba(239,68,68,0.4)" }}>
-          <Crown size={14} color="#fff" />
-        </div>
-        <span style={{ fontSize: 14, fontWeight: 900, color: "#F1F5F9" }}>
-          Verba<span style={{ color: "#EF4444" }}>Tech</span>
-          <span style={{ fontSize: 9, color: "#EF4444", fontWeight: 700,
-            marginLeft: 6, background: "rgba(239,68,68,0.15)", padding: "1px 6px",
-            borderRadius: 4, border: "1px solid rgba(239,68,68,0.3)" }}>ADMIN</span>
-        </span>
-      </div>
-
-      <div style={{ flex: 1 }}>
-        <span style={{ fontSize: 13, color: "#64748B" }}>Painel Administrativo Global</span>
-      </div>
-
-      {/* status bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6,
-        background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.15)",
-        borderRadius: 8, padding: "5px 10px" }}>
-        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ADE80",
-          boxShadow: "0 0 6px #4ADE80", animation: "pulse 2s infinite" }} />
-        <span style={{ fontSize: 10, color: "#4ADE80", fontWeight: 700 }}>Sistema Operacional</span>
-      </div>
-
-      {/* user */}
-      <div style={{ position: "relative" }}>
-        <button onClick={() => setShowMenu(v => !v)} style={{
-          display: "flex", alignItems: "center", gap: 9,
-          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 10, padding: "7px 12px", cursor: "pointer",
-        }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8,
-            background: "linear-gradient(135deg,#EF4444,#DC2626)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 11, fontWeight: 800, color: "#fff" }}>
-            {user.avatar}
-          </div>
-          <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#E2E8F0" }}>{user.nome.split(" ")[0]}</div>
-            <div style={{ fontSize: 9, color: "#EF4444", fontWeight: 700 }}>Administrador</div>
-          </div>
-        </button>
-        {showMenu && (
-          <div style={{
-            position: "absolute", top: "calc(100% + 8px)", right: 0, width: 180,
-            background: "#0D1525", border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 12, padding: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.5)", zIndex: 300,
-          }}>
-            {[
-              { icon: Settings, label: "Configurações" },
-              { icon: Shield, label: "Auditoria" },
-            ].map(({ icon: Icon, label }) => (
-              <button key={label} style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 10,
-                padding: "9px 12px", borderRadius: 8, border: "none",
-                background: "transparent", color: "#94A3B8", fontSize: 12,
-                cursor: "pointer", textAlign: "left",
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-              >
-                <Icon size={13} /> {label}
-              </button>
-            ))}
-            <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "6px 0" }} />
-            <button onClick={onLogout} style={{
-              width: "100%", display: "flex", alignItems: "center", gap: 10,
-              padding: "9px 12px", borderRadius: 8, border: "none",
-              background: "transparent", color: "#EF4444", fontSize: 12,
-              cursor: "pointer", textAlign: "left",
-            }}>
-              <LogOut size={13} /> Sair
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 /* ── KPI card ───────────────────────────── */
 function KpiCard({ icon: Icon, label, value, sub, color, delta, up }) {
@@ -225,21 +126,15 @@ function IntRow({ integ }) {
 
 /* ── MAIN ───────────────────────────────── */
 export default function DashboardAdmin() {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const corbans = mockCorbans.filter(c => c.role === "master" || !c.parent);
-  const sem2FA  = mockUsuariosSistema.filter(u => !u.twoFA).length;
-  const online  = mockIntegracoes.filter(i => i.status === "online").length;
+  const sem2FA    = mockUsuariosSistema.filter(u => !u.twoFA).length;
+  const online    = mockIntegracoes.filter(i => i.status === "online").length;
   const totalProd = mockGraficoProducao.reduce((a, m) => a + m.producao, 0);
 
-  function handleLogout() { logout(); navigate("/login"); }
-
   return (
-    <div style={{ minHeight: "100vh", background: "#05080F" }}>
-      <AdminTopbar user={user} onLogout={handleLogout} />
-      <div style={S.page}>
+    <div style={S.page}>
 
         {/* ── Boas vindas ── */}
         <div style={{ marginBottom: 24,
@@ -541,8 +436,6 @@ export default function DashboardAdmin() {
             </div>
           </div>
         )}
-      </div>
-
       <style>{`
         @keyframes pulse {
           0%,100%{ opacity:.3; transform:scale(1); }

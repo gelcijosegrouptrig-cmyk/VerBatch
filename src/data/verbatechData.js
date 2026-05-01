@@ -869,3 +869,343 @@ export const mockIpRestrictions = [
   { id: "ip003", descricao: "IP Bot Detectado", range: "45.33.32.0/24", tipo: "bloqueado", usuarios: [] },
   { id: "ip004", descricao: "Tor Exit Node", range: "185.220.101.0/24", tipo: "bloqueado", usuarios: [] },
 ];
+
+// ─────────────────────────────────────────────────────────────
+// BAAS — Banking as a Service: Conta Master + Subcontas + Split
+// ─────────────────────────────────────────────────────────────
+export const mockContaMaster = {
+  numero: "VBT-00001-0",
+  banco: "QI Tech / Celcoin",
+  agencia: "0001",
+  tipo: "Conta Pagamento Master",
+  saldo: 1_842_390.50,
+  saldoBloqueado: 312_000.00,   // em custódia (CCBs em aberto)
+  saldoDisponivel: 1_530_390.50,
+  saldoFIDC: 8_400_000.00,      // PL do fundo aportado
+  limiteCredito: 12_000_000.00,
+  pixKey: "financeiro@verbatech.com.br",
+  ispb: "23114447",
+  parceiro: "QI Tech (SCD)",
+  licenca: "SCD via White Label QI Tech",
+  ultimaAtualizacao: "30/04/2025 09:15",
+};
+
+export const mockSubcontas = [
+  {
+    id: "sub001", corbanId: "c001", nome: "Ricardo Mendes — Matriz SP",
+    numero: "VBT-00123-4", saldo: 42_750.80, saldoPendente: 8_320.00,
+    splitPct: 3.0, totalRecebido: 198_340.00, status: "ativa",
+    banco: "VerbaTech Digital", pixKey: "ricardo@verba.com",
+    ultimoCredito: "2025-04-29", ultimoValor: 4_820.00,
+  },
+  {
+    id: "sub002", corbanId: "c002", nome: "Ana Paula Ferreira — RJ",
+    numero: "VBT-00124-5", saldo: 12_450.30, saldoPendente: 2_100.00,
+    splitPct: 2.5, totalRecebido: 54_600.00, status: "ativa",
+    banco: "VerbaTech Digital", pixKey: "ana@verba.com",
+    ultimoCredito: "2025-04-29", ultimoValor: 1_860.00,
+  },
+  {
+    id: "sub003", corbanId: "c003", nome: "Carlos Almeida — BH",
+    numero: "VBT-00125-6", saldo: 7_880.00, saldoPendente: 950.00,
+    splitPct: 2.5, totalRecebido: 32_400.00, status: "ativa",
+    banco: "VerbaTech Digital", pixKey: "carlos@verba.com",
+    ultimoCredito: "2025-04-28", ultimoValor: 1_140.00,
+  },
+  {
+    id: "sub004", corbanId: "c007", nome: "Paulo Rodrigues — Campinas",
+    numero: "VBT-00126-7", saldo: 5_210.00, saldoPendente: 620.00,
+    splitPct: 2.0, totalRecebido: 21_800.00, status: "ativa",
+    banco: "VerbaTech Digital", pixKey: "paulo@verba.com",
+    ultimoCredito: "2025-04-27", ultimoValor: 930.00,
+  },
+  {
+    id: "sub005", corbanId: "c004", nome: "Juliana Costa — Niterói",
+    numero: "VBT-00127-8", saldo: 2_340.00, saldoPendente: 310.00,
+    splitPct: 2.0, totalRecebido: 14_400.00, status: "ativa",
+    banco: "VerbaTech Digital", pixKey: "juliana@verba.com",
+    ultimoCredito: "2025-04-26", ultimoValor: 576.00,
+  },
+  {
+    id: "sub006", corbanId: "c005", nome: "Marcos Oliveira — Duque de Caxias",
+    numero: "VBT-00128-9", saldo: 0.00, saldoPendente: 0.00,
+    splitPct: 2.0, totalRecebido: 5_400.00, status: "bloqueada",
+    banco: "VerbaTech Digital", pixKey: "marcos@verba.com",
+    ultimoCredito: "2025-03-15", ultimoValor: 270.00,
+  },
+];
+
+export const mockSplitRegras = {
+  plataforma: 1.5,        // % que a plataforma retém de cada contrato
+  corbanMin: 1.0,         // % mínimo garantido ao Corban
+  corbanMax: 3.5,         // % máximo permitido ao Corban
+  vendedorMin: 0.3,       // % mínimo para o vendedor (do split do Corban)
+  vendedorMax: 1.5,
+  parceiroBaaS: 0.4,      // custo de infra QI Tech / Celcoin
+  fundo: 94.6,            // % que retorna ao FIDC (capital + spread)
+  exemploContrato: {
+    valor: 20_000,
+    totalLiberar: 20_000,
+    retornoFundo: 18_920,
+    taxaPlataforma: 300,
+    comissaoCorban: 600,
+    comissaoVendedor: 180,
+    custoBaaS: 80,
+  },
+};
+
+export const mockTransacoesSplit = [
+  { id: "trx001", data: "2025-04-30 09:12", ccbId: "CCB-2025-089", cliente: "José Pereira", valor: 18_000, tipo: "liberacao",
+    split: { fundo: 17_028, plataforma: 270, corban: 540, vendedor: 162 }, corban: "Ana Paula — SP-Centro", status: "liquidado" },
+  { id: "trx002", data: "2025-04-30 08:45", ccbId: "CCB-2025-088", cliente: "Maria Souza", valor: 25_000, tipo: "liberacao",
+    split: { fundo: 23_650, plataforma: 375, corban: 750, vendedor: 225 }, corban: "Carlos Almeida — BH", status: "liquidado" },
+  { id: "trx003", data: "2025-04-29 17:30", ccbId: "CCB-2025-087", cliente: "Pedro Lima", valor: 12_000, tipo: "parcela",
+    split: { fundo: 11_352, plataforma: 180, corban: 360, vendedor: 108 }, corban: "Ricardo Mendes — SP", status: "liquidado" },
+  { id: "trx004", data: "2025-04-29 15:10", ccbId: "CCB-2025-086", cliente: "Ana Ferreira", valor: 30_000, tipo: "liberacao",
+    split: { fundo: 28_380, plataforma: 450, corban: 900, vendedor: 270 }, corban: "Paulo Rodrigues — Campinas", status: "liquidado" },
+  { id: "trx005", data: "2025-04-29 11:00", ccbId: "CCB-2025-085", cliente: "Lúcia Ramos", valor: 8_500, tipo: "parcela",
+    split: { fundo: 8_041, plataforma: 127.50, corban: 255, vendedor: 76.5 }, corban: "Juliana Costa — Niterói", status: "liquidado" },
+  { id: "trx006", data: "2025-04-28 14:20", ccbId: "CCB-2025-084", cliente: "Renato Castro", valor: 22_000, tipo: "liberacao",
+    split: { fundo: 20_812, plataforma: 330, corban: 660, vendedor: 198 }, corban: "Ana Paula — SP-Centro", status: "liquidado" },
+];
+
+export const mockSaldoHistorico = [
+  { mes: "Nov/24", entrada: 320_000, saida: 290_000, saldo: 42_000 },
+  { mes: "Dez/24", entrada: 410_000, saida: 375_000, saldo: 77_000 },
+  { mes: "Jan/25", entrada: 380_000, saida: 348_000, saldo: 109_000 },
+  { mes: "Fev/25", entrada: 445_000, saida: 398_000, saldo: 156_000 },
+  { mes: "Mar/25", entrada: 520_000, saida: 462_000, saldo: 214_000 },
+  { mes: "Abr/25", entrada: 618_000, saida: 543_000, saldo: 289_000 },
+];
+
+// ─────────────────────────────────────────────────────────────
+// CCB — Cédula de Crédito Bancário + Formalização Digital
+// ─────────────────────────────────────────────────────────────
+export const mockCCBs = [
+  {
+    id: "CCB-2025-089", propostaId: "VBT-2025-089",
+    cliente: "José Pereira da Silva", cpf: "012.345.678-90",
+    produto: "Consignado INSS", convenio: "INSS",
+    valor: 18_000, parcelas: 84, taxa: 1.80, parcela: 394.20,
+    totalPagar: 33_112.80,
+    emissao: "2025-04-30", vencimento1: "2025-06-01",
+    status: "averbado",           // rascunho | pendente_assinatura | assinado | averbado | cancelado
+    assinaturaStatus: "biometria_ok",
+    dataAssinatura: "2025-04-30 09:05",
+    averbacaoData: "2025-04-30 09:12",
+    liberacaoData: "2025-04-30 09:15",
+    pixDestino: "012.345.678-90",
+    scd: "QI Tech",
+    matricula: "987.654.321-2",
+    orgao: "INSS",
+    margemUsada: 394.20,
+    corban: "Ana Paula Santos", digitador: "Ana Paula Santos",
+    documentos: ["RG", "CPF", "Comprovante de renda", "Extrato INSS"],
+    biometria: true, assinaturaEletronica: true,
+  },
+  {
+    id: "CCB-2025-088", propostaId: "VBT-2025-088",
+    cliente: "Maria Aparecida Souza", cpf: "098.765.432-10",
+    produto: "Consignado INSS", convenio: "INSS",
+    valor: 25_000, parcelas: 96, taxa: 1.75, parcela: 521.30,
+    totalPagar: 50_044.80,
+    emissao: "2025-04-30", vencimento1: "2025-06-01",
+    status: "averbado",
+    assinaturaStatus: "biometria_ok",
+    dataAssinatura: "2025-04-30 08:40",
+    averbacaoData: "2025-04-30 08:43",
+    liberacaoData: "2025-04-30 08:45",
+    pixDestino: "098.765.432-10",
+    scd: "QI Tech",
+    matricula: "123.456.789-1",
+    orgao: "INSS",
+    margemUsada: 521.30,
+    corban: "Carlos Almeida", digitador: "Carlos Almeida",
+    documentos: ["RG", "CPF", "Comprovante de renda"],
+    biometria: true, assinaturaEletronica: true,
+  },
+  {
+    id: "CCB-2025-090", propostaId: "VBT-2025-090",
+    cliente: "Roberto Nascimento", cpf: "045.678.901-23",
+    produto: "FGTS Antecipação", convenio: "FGTS",
+    valor: 9_800, parcelas: 12, taxa: 1.55, parcela: 900.40,
+    totalPagar: 10_804.80,
+    emissao: "2025-04-30", vencimento1: "2025-05-15",
+    status: "pendente_assinatura",
+    assinaturaStatus: "aguardando_biometria",
+    dataAssinatura: null,
+    averbacaoData: null,
+    liberacaoData: null,
+    pixDestino: "045.678.901-23",
+    scd: "QI Tech",
+    matricula: null,
+    orgao: "CAIXA",
+    margemUsada: null,
+    corban: "Paulo Rodrigues", digitador: "Paulo Rodrigues",
+    documentos: ["RG", "CPF", "Extrato FGTS"],
+    biometria: false, assinaturaEletronica: false,
+  },
+  {
+    id: "CCB-2025-091", propostaId: "VBT-2025-091",
+    cliente: "Claudia Ferreira Lima", cpf: "067.890.123-45",
+    produto: "Consignado SIAPE", convenio: "SIAPE",
+    valor: 35_000, parcelas: 84, taxa: 1.66, parcela: 745.80,
+    totalPagar: 62_647.20,
+    emissao: "2025-04-29", vencimento1: "2025-06-01",
+    status: "assinado",
+    assinaturaStatus: "biometria_ok",
+    dataAssinatura: "2025-04-29 16:10",
+    averbacaoData: null,
+    liberacaoData: null,
+    pixDestino: "067.890.123-45",
+    scd: "QI Tech",
+    matricula: "SIAPE-456789",
+    orgao: "SIAPE",
+    margemUsada: 745.80,
+    corban: "Ricardo Mendes", digitador: "Fernanda Lima",
+    documentos: ["Funcional", "CPF", "Contra-cheque"],
+    biometria: true, assinaturaEletronica: true,
+  },
+  {
+    id: "CCB-2025-092", propostaId: "VBT-2025-092",
+    cliente: "Antônio Barros Santos", cpf: "089.012.345-67",
+    produto: "Consignado INSS", convenio: "INSS",
+    valor: 15_000, parcelas: 60, taxa: 1.80, parcela: 380.60,
+    totalPagar: 22_836.00,
+    emissao: "2025-04-30", vencimento1: "2025-06-01",
+    status: "rascunho",
+    assinaturaStatus: "nao_iniciado",
+    dataAssinatura: null, averbacaoData: null, liberacaoData: null,
+    pixDestino: null,
+    scd: "QI Tech",
+    matricula: "654.321.987-3",
+    orgao: "INSS",
+    margemUsada: 380.60,
+    corban: "Ana Paula Santos", digitador: "Ana Paula Santos",
+    documentos: [],
+    biometria: false, assinaturaEletronica: false,
+  },
+];
+
+export const mockConvenios = [
+  { id: "conv001", nome: "INSS / Dataprev", sigla: "INSS", status: "online", latencia: 142, margensConsultadas: 1847, averbacoes: 234, taxaBase: 1.80, prazoMax: 84, limiteIdade: 80, api: "Dataprev API v4" },
+  { id: "conv002", nome: "SIAPE (Servidores Federais)", sigla: "SIAPE", status: "online", latencia: 210, margensConsultadas: 412, averbacoes: 58, taxaBase: 1.66, prazoMax: 96, limiteIdade: 75, api: "SIAPE API v3" },
+  { id: "conv003", nome: "CAIXA (FGTS)", sigla: "FGTS", status: "online", latencia: 188, margensConsultadas: 603, averbacoes: 89, taxaBase: 1.55, prazoMax: 12, limiteIdade: 70, api: "CAIXA API v2" },
+  { id: "conv004", nome: "Gov. Estado SP", sigla: "EST-SP", status: "parcial", latencia: 540, margensConsultadas: 98, averbacoes: 12, taxaBase: 2.00, prazoMax: 72, limiteIdade: 70, api: "SEP-SP API v1" },
+  { id: "conv005", nome: "Prefeitura SP", sigla: "PMSP", status: "manutencao", latencia: null, margensConsultadas: 0, averbacoes: 0, taxaBase: 1.90, prazoMax: 72, limiteIdade: 70, api: "PMSP API v1" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// FIDC — Fundo de Investimento em Direitos Creditórios
+// ─────────────────────────────────────────────────────────────
+export const mockFIDC = {
+  nome: "VerbaTech FIDC Consignado I",
+  cnpj: "45.678.901/0001-23",
+  administrador: "BRL Trust DTVM",
+  gestor: "VerbaTech Gestora",
+  custodiante: "BTG Pactual",
+  auditor: "KPMG",
+  rating: "AA- (Fitch)",
+  tipo: "Aberto — Subordinado/Sênior",
+  patrimonio: 12_400_000,
+  carteira: 9_840_000,        // direitos creditórios ativos
+  disponivel: 2_560_000,      // para novos contratos
+  cotasSenior: 8_000_000,
+  cotasSubordinadas: 4_400_000,
+  cotaSeniorValor: 1_082.40,  // R$/cota (correção IPCA+8%)
+  cotaSubValor: 1_241.80,
+  inadimplencia: 1.42,        // %
+  spreadMedio: 12.8,          // % a.a. acima do custo de capital
+  tir: 18.4,                  // % a.a. TIR do fundo
+  inicioFundo: "2023-06-01",
+  dataReferencia: "2025-04-30",
+  investidores: 14,
+  statusCVM: "Registrado CVM — ICVM 356",
+};
+
+export const mockFIDCEvolucao = [
+  { mes: "Nov/24", pl: 8_200_000, carteira: 6_100_000, inadimplencia: 1.62 },
+  { mes: "Dez/24", pl: 9_100_000, carteira: 6_900_000, inadimplencia: 1.58 },
+  { mes: "Jan/25", pl: 9_800_000, carteira: 7_400_000, inadimplencia: 1.51 },
+  { mes: "Fev/25", pl: 10_600_000, carteira: 8_100_000, inadimplencia: 1.48 },
+  { mes: "Mar/25", pl: 11_500_000, carteira: 8_900_000, inadimplencia: 1.45 },
+  { mes: "Abr/25", pl: 12_400_000, carteira: 9_840_000, inadimplencia: 1.42 },
+];
+
+export const mockFIDCCedentes = [
+  { id: "ced001", nome: "VerbaTech Master SP", contratos: 148, saldo: 4_320_000, inadimplencia: 1.1, status: "ativo" },
+  { id: "ced002", nome: "Corban Ana Paula — RJ", contratos: 62, saldo: 1_820_000, inadimplencia: 1.4, status: "ativo" },
+  { id: "ced003", nome: "Corban Carlos — BH", contratos: 38, saldo: 1_140_000, inadimplencia: 2.1, status: "ativo" },
+  { id: "ced004", nome: "Corban Paulo — Campinas", contratos: 31, saldo: 920_000, inadimplencia: 1.8, status: "ativo" },
+  { id: "ced005", nome: "Corban Juliana — Niterói", contratos: 24, saldo: 720_000, inadimplencia: 0.9, status: "ativo" },
+  { id: "ced006", nome: "Corban Marcos — Duque", contratos: 9, saldo: 270_000, inadimplencia: 4.2, status: "suspenso" },
+];
+
+export const mockFIDCEventos = [
+  { id: "ev001", data: "2025-04-30", tipo: "cessao", descricao: "Cessão de 12 CCBs — Corban SP", valor: 186_000, status: "processado" },
+  { id: "ev002", data: "2025-04-29", tipo: "liquidacao", descricao: "Liquidação 34 parcelas INSS", valor: 48_200, status: "processado" },
+  { id: "ev003", data: "2025-04-28", tipo: "aporte", descricao: "Aporte cota subordinada — VerbaTech", valor: 500_000, status: "processado" },
+  { id: "ev004", data: "2025-04-28", tipo: "resgate", descricao: "Resgate parcial cota sênior — Investidor BTG", valor: 200_000, status: "processado" },
+  { id: "ev005", data: "2025-04-27", tipo: "cessao", descricao: "Cessão de 8 CCBs — Corban RJ", valor: 112_000, status: "processado" },
+  { id: "ev006", data: "2025-04-30", tipo: "cessao", descricao: "Cessão de 6 CCBs — Corban Campinas (pendente)", valor: 78_000, status: "pendente" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// REGRAS GLOBAIS DE PRODUTO (Admin define por Corban)
+// ─────────────────────────────────────────────────────────────
+export const mockRegrasProduto = [
+  {
+    id: "rg001", corbanId: "c001", corbanNome: "Ricardo Mendes — Matriz",
+    produtos: ["consignadoINSS", "consignadoSIAPE", "fgts", "rmc", "rcc", "pessoal"],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: 1.66, taxaMaxFGTS: 1.55,
+    prazoMaxINSS: 84, prazoMaxFGTS: 12,
+    splitCorban: 3.0, splitVendedor: 0.8,
+    limiteOperacao: 50_000, limiteCarteira: 500_000,
+    ativo: true, nivel: "Diamante",
+  },
+  {
+    id: "rg002", corbanId: "c002", corbanNome: "Ana Paula — RJ",
+    produtos: ["consignadoINSS", "fgts", "rmc"],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: null, taxaMaxFGTS: 1.55,
+    prazoMaxINSS: 84, prazoMaxFGTS: 12,
+    splitCorban: 2.5, splitVendedor: 0.6,
+    limiteOperacao: 30_000, limiteCarteira: 200_000,
+    ativo: true, nivel: "Ouro",
+  },
+  {
+    id: "rg003", corbanId: "c003", corbanNome: "Carlos Almeida — BH",
+    produtos: ["consignadoINSS", "fgts"],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: null, taxaMaxFGTS: 1.55,
+    prazoMaxINSS: 72, prazoMaxFGTS: 12,
+    splitCorban: 2.5, splitVendedor: 0.6,
+    limiteOperacao: 25_000, limiteCarteira: 150_000,
+    ativo: true, nivel: "Prata",
+  },
+  {
+    id: "rg004", corbanId: "c007", corbanNome: "Paulo Rodrigues — Campinas",
+    produtos: ["consignadoINSS", "fgts"],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: null, taxaMaxFGTS: 1.55,
+    prazoMaxINSS: 60, prazoMaxFGTS: 12,
+    splitCorban: 2.0, splitVendedor: 0.5,
+    limiteOperacao: 20_000, limiteCarteira: 100_000,
+    ativo: true, nivel: "Prata",
+  },
+  {
+    id: "rg005", corbanId: "c004", corbanNome: "Juliana Costa — Niterói",
+    produtos: ["consignadoINSS"],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: null, taxaMaxFGTS: null,
+    prazoMaxINSS: 48, prazoMaxFGTS: null,
+    splitCorban: 2.0, splitVendedor: 0.5,
+    limiteOperacao: 15_000, limiteCarteira: 80_000,
+    ativo: true, nivel: "Bronze",
+  },
+  {
+    id: "rg006", corbanId: "c005", corbanNome: "Marcos Oliveira — Duque",
+    produtos: [],
+    taxaMaxINSS: 1.80, taxaMaxSIAPE: null, taxaMaxFGTS: null,
+    prazoMaxINSS: 48, prazoMaxFGTS: null,
+    splitCorban: 2.0, splitVendedor: 0.5,
+    limiteOperacao: 10_000, limiteCarteira: 50_000,
+    ativo: false, nivel: "Bronze",
+  },
+];
